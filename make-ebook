@@ -4,6 +4,7 @@ import html
 import json
 import os
 import textwrap
+import itertools
 
 from ebooklib import epub
 
@@ -52,11 +53,11 @@ def main():
     print('- Loading parts...')
     chapters = []
     for id_, (username, created) in sorted(spine.items(), key=lambda item: item[1][1]):
-        with open(os.path.join('parts', username, id_ + '.html')) as file:
+        with open(os.path.join('parts', username, id_ + '.html'), encoding='utf8') as file:
             html_content = file.read()
 
-        with open(os.path.join('parts', username, id_ + '.txt')) as file:
-            text = file.read()
+        with open(os.path.join('parts', username, id_ + '.txt'), encoding='utf8') as file:
+            text = file.read())
 
         file_name = id_ + '.xhtml'
         chapter = epub.EpubHtml(file_name=file_name)
@@ -70,7 +71,7 @@ def main():
 
     book.add_item(epub.EpubNcx())
     book.add_item(epub.EpubNav())
-    book.spine = ['cover', 'nav', *chapters, 'back-cover']
+    book.spine = list(itertools.chain.from_iterable(['cover', 'nav', chapters, 'back-cover']))
 
     file_name = '%s #%d.epub' % (book.title, len(chapters))
     print('- Saving: %s...' % file_name)
